@@ -1,0 +1,4 @@
+ext {
+	/* Change to suit the environment */
+	repositoryUrl = 'file://Users/kensakurai/Github/kemsakurai.github.io/maven/master/releases'
+}
