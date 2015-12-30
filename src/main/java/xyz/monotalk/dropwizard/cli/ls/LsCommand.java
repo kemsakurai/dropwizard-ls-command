@@ -107,7 +107,6 @@ public class LsCommand<T extends Configuration> extends ConfiguredCommand<T> {
         stdOut.println("/= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =:");
         stdOut.println();
         stdOut.println("available commands:");
-        stdOut.println();
 
         String previousCategory = null;
         for (CommandString elem : commandStrings) {
