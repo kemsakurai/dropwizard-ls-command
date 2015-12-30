@@ -72,6 +72,6 @@ public class LsCommandTest {
         List<Command> commands = Lists.newArrayList(new LsCommand(application));
         when(bootstrap.getCommands()).thenReturn(ImmutableList.copyOf(commands));
         command.run(bootstrap, namespace, configuration);
-        verifyZeroInteractions(namespace, configuration);
+        verifyZeroInteractions(configuration);
     }
 }

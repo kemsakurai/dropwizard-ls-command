@@ -17,20 +17,28 @@ package xyz.monotalk.dropwizard.cli.ls;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
+import com.google.common.io.ByteArrayDataInput;
+import com.google.common.io.ByteStreams;
 import io.dropwizard.Application;
 import io.dropwizard.cli.ConfiguredCommand;
 import io.dropwizard.Configuration;
 import io.dropwizard.cli.CheckCommand;
+import io.dropwizard.cli.Cli;
 import io.dropwizard.cli.Command;
 import io.dropwizard.cli.ServerCommand;
 import io.dropwizard.setup.Bootstrap;
+import io.dropwizard.util.JarLocation;
+import java.io.ByteArrayOutputStream;
 import java.io.OutputStreamWriter;
+import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+import net.sourceforge.argparse4j.impl.Arguments;
 import net.sourceforge.argparse4j.inf.Namespace;
+import net.sourceforge.argparse4j.inf.Subparser;
 import org.fusesource.jansi.AnsiConsole;
 import static org.fusesource.jansi.Ansi.*;
 import static org.fusesource.jansi.Ansi.Color.*;
@@ -75,11 +83,25 @@ public class LsCommand<T extends Configuration> extends ConfiguredCommand<T> {
     }
 
     @Override
+    public void configure(Subparser subparser) {
+        super.configure(subparser);
+        // Add -l Option
+        subparser.addArgument("-l")
+                .action(Arguments.storeTrue())
+                .help("List in long format. If the output is to a terminal, command's helps is output after command description");
+    }
+
+    @Override
     protected void run(Bootstrap<T> bootstrap, Namespace namespace, T configuration) throws Exception {
         // --------------------------------------------
         // AnsiConsole.systemInstall()
         // -----------------
         AnsiConsole.systemInstall();
+
+        Boolean hasLOptinon = namespace.getBoolean("-l");
+        if (hasLOptinon == null) {
+            hasLOptinon = false;
+        }
 
         List<Command> commands = bootstrap.getCommands();
         Set<CommandString> commandStrings = new TreeSet<>();
@@ -115,8 +137,23 @@ public class LsCommand<T extends Configuration> extends ConfiguredCommand<T> {
                 stdOut.println();
                 stdOut.println(ansi().fg(RED).a("[" + currentCategory + "]").reset());
                 previousCategory = currentCategory;
+
             }
             stdOut.println(indent() + elem.getName() + " : " + ansi().fg(BLUE).a(elem.getDescription()).reset());
+            if (hasLOptinon) {
+                ByteArrayOutputStream bosOut = new ByteArrayOutputStream();
+                PrintStream psOut = new PrintStream(bosOut);
+                ByteArrayOutputStream bosErr = new ByteArrayOutputStream();
+                PrintStream psErr = new PrintStream(bosErr);
+                // execute Cli#run()
+                final Cli cli = new Cli(new JarLocation(getClass()), bootstrap, psOut, psErr);
+                cli.run(elem.getName(), "-h");
+                ByteArrayDataInput input = ByteStreams.newDataInput(bosOut.toString("UTF-8").getBytes());
+                String line = input.readLine();
+                while (line != null) {
+                    stdOut.println(indent() + indent() + line);
+                }
+            }
         }
 
         stdOut.println();
