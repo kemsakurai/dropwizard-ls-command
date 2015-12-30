@@ -64,7 +64,7 @@ public class LsCommandTest {
     @Test
     public void hasADescription() throws Exception {
         assertThat(command.getDescription())
-                .isEqualTo("Output subCommands's infomation to console");
+                .isEqualTo("Output subCommands's infomation to console and exit");
     }
 
     @Test

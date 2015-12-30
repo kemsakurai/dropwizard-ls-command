@@ -39,11 +39,13 @@ import static org.fusesource.jansi.Ansi.Color.*;
  * LsCommand
  *
  * @author Kem
- * @param <T>
+ * @param <T> Application Configruation
  */
 public class LsCommand<T extends Configuration> extends ConfiguredCommand<T> {
 
     private final Class<T> configurationClass;
+
+    private final String applicationName;
 
     private final Set<Class<? extends Command>> defaultCommands = new HashSet<Class<? extends Command>>() {
         private static final long serialVersionUID = -2855157286174568533L;
@@ -57,8 +59,9 @@ public class LsCommand<T extends Configuration> extends ConfiguredCommand<T> {
     private final PrintWriter stdOut;
 
     public LsCommand(Application<T> application) {
-        super("ls", "Output subCommands's infomation to console");
+        super("ls", "Output subCommands's infomation to console and exit");
         this.configurationClass = application.getConfigurationClass();
+        this.applicationName = application.getName();
         this.stdOut = new PrintWriter(new OutputStreamWriter(System.out, Charsets.UTF_8), true);
     }
 
@@ -92,23 +95,35 @@ public class LsCommand<T extends Configuration> extends ConfiguredCommand<T> {
             if (Strings.isNullOrEmpty(category)) {
                 if (defaultCommands.contains(command.getClass())) {
                     category = Strs.CATEGORY_DEFAULT;
+                } else {
+                    category = applicationName;
                 }
             }
             commandString.setCategory(category);
             commandStrings.add(commandString);
         });
 
-        stdOut.println("");
+        stdOut.println("LsCommand's output start!!!>>>");
+        stdOut.println("/= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =:");
+        stdOut.println();
         stdOut.println("available commands:");
-        stdOut.println("");
+        stdOut.println();
 
-        commandStrings.stream().forEach((elem) -> {
-            String previousCategory = "";
-            if (previousCategory.equals(elem.getCategory())) {
-                stdOut.println(ansi().eraseScreen().fg(RED).a("[" + elem.getCategory() + "]").reset());
+        String previousCategory = null;
+        for (CommandString elem : commandStrings) {
+            if (!elem.getCategory().equals(previousCategory)) {
+                String currentCategory = elem.getCategory();
+                stdOut.println();
+                stdOut.println(ansi().fg(RED).a("[" + currentCategory + "]").reset());
+                previousCategory = currentCategory;
             }
-            stdOut.println(indent() + elem.getName() + " : " + ansi().eraseScreen().fg(BLUE).a(elem.getDescription()).reset());
-        });
+            stdOut.println(indent() + elem.getName() + " : " + ansi().fg(BLUE).a(elem.getDescription()).reset());
+        }
+
+        stdOut.println();
+        stdOut.println("= = = = = = = = = =/ ");
+        stdOut.println("<<< LsCommand's output end!!!");
+
         // --------------------------------------------
         // AnsiConsole.systemUninstall()
         // -----------------
@@ -119,7 +134,7 @@ public class LsCommand<T extends Configuration> extends ConfiguredCommand<T> {
         return "    ";
     }
 
-    static class CommandString implements Comparable {
+    static class CommandString implements Comparable<CommandString> {
 
         public String getName() {
             return name;
@@ -149,18 +164,17 @@ public class LsCommand<T extends Configuration> extends ConfiguredCommand<T> {
         private String category;
 
         @Override
-        public int compareTo(Object o) {
-            CommandString obj = (CommandString) o;
+        public int compareTo(CommandString o) {
 
-            int result = this.getCategory().compareTo(obj.getCategory());
+            int result = this.getCategory().compareTo(o.getCategory());
             if (result != 0) {
                 return result;
             }
-            result = this.getName().compareTo(obj.getName());
+            result = this.getName().compareTo(o.getName());
             if (result != 0) {
                 return result;
             }
-            result = this.getDescription().compareTo(obj.getDescription());
+            result = this.getDescription().compareTo(o.getDescription());
             return result;
         }
     }
