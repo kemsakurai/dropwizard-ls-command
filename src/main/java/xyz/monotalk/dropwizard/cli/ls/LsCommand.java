@@ -152,14 +152,14 @@ public class LsCommand<T extends Configuration> extends ConfiguredCommand<T> {
                 ByteArrayDataInput input = ByteStreams.newDataInput(bosOut.toString("UTF-8").getBytes());
 
                 stdOut.println();
-                stdOut.println("/==========================================================:/");
+                stdOut.println(INDENT + "======================================================:/");
 
                 String line = input.readLine();
                 while (line != null) {
                     stdOut.println(INDENT + INDENT + line);
                     line = input.readLine();
                 }
-                stdOut.println("/==========================================================:/");
+                stdOut.println(INDENT + "======================================================:/");
                 stdOut.println();
             }
         }
