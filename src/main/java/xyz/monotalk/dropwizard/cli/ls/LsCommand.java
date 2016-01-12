@@ -42,6 +42,8 @@ import net.sourceforge.argparse4j.inf.Subparser;
 import org.fusesource.jansi.AnsiConsole;
 import static org.fusesource.jansi.Ansi.*;
 import static org.fusesource.jansi.Ansi.Color.*;
+import static xyz.monotalk.dropwizard.cli.ls.Strs.INDENT;
+import static xyz.monotalk.dropwizard.cli.ls.Strs.INDENT_ASTAH;
 
 /**
  * LsCommand
@@ -98,7 +100,7 @@ public class LsCommand<T extends Configuration> extends ConfiguredCommand<T> {
         // -----------------
         AnsiConsole.systemInstall();
 
-        Boolean hasLOptinon = namespace.getBoolean("-l");
+        Boolean hasLOptinon = namespace.getBoolean("l");
         if (hasLOptinon == null) {
             hasLOptinon = false;
         }
@@ -124,9 +126,6 @@ public class LsCommand<T extends Configuration> extends ConfiguredCommand<T> {
             commandString.setCategory(category);
             commandStrings.add(commandString);
         });
-
-        stdOut.println("LsCommand's output start!!!>>>");
-        stdOut.println("/= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =:");
         stdOut.println();
         stdOut.println("available commands:");
 
@@ -139,7 +138,9 @@ public class LsCommand<T extends Configuration> extends ConfiguredCommand<T> {
                 previousCategory = currentCategory;
 
             }
-            stdOut.println(indent() + elem.getName() + " : " + ansi().fg(BLUE).a(elem.getDescription()).reset());
+
+            stdOut.println(INDENT_ASTAH + elem.getName() + " : " + ansi().fg(BLUE).a(elem.getDescription()).reset());
+
             if (hasLOptinon) {
                 ByteArrayOutputStream bosOut = new ByteArrayOutputStream();
                 PrintStream psOut = new PrintStream(bosOut);
@@ -149,25 +150,25 @@ public class LsCommand<T extends Configuration> extends ConfiguredCommand<T> {
                 final Cli cli = new Cli(new JarLocation(getClass()), bootstrap, psOut, psErr);
                 cli.run(elem.getName(), "-h");
                 ByteArrayDataInput input = ByteStreams.newDataInput(bosOut.toString("UTF-8").getBytes());
+
+                stdOut.println();
+                stdOut.println("/==========================================================:/");
+
                 String line = input.readLine();
                 while (line != null) {
-                    stdOut.println(indent() + indent() + line);
+                    stdOut.println(INDENT + INDENT + line);
+                    line = input.readLine();
                 }
+                stdOut.println("/==========================================================:/");
+                stdOut.println();
             }
         }
-
         stdOut.println();
-        stdOut.println("= = = = = = = = = =/ ");
-        stdOut.println("<<< LsCommand's output end!!!");
 
         // --------------------------------------------
         // AnsiConsole.systemUninstall()
         // -----------------
         AnsiConsole.systemUninstall();
-    }
-
-    private String indent() {
-        return "    ";
     }
 
     static class CommandString implements Comparable<CommandString> {

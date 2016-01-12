@@ -17,9 +17,14 @@ package xyz.monotalk.dropwizard.cli.ls;
 
 /**
  * Strs
+ *
  * @author Kem
  */
 public class Strs {
+
+    public static final String INDENT = "    ";
+
+    public static final String INDENT_ASTAH = "  * ";
 
     public static final String CATEGORY_DEFAULT = "default";
 }
