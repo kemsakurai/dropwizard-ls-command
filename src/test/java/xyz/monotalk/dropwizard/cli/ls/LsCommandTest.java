@@ -54,6 +54,7 @@ public class LsCommandTest {
         public void run(Configuration configuration, Environment environment) throws Exception {
         }
     }
+    
     private final MyApplication application = new MyApplication();
     private final LsCommand<Configuration> command = new LsCommand<>(application);
 
