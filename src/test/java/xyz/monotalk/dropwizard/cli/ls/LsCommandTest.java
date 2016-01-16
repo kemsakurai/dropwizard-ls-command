@@ -1,17 +1,19 @@
-/*
- * Copyright 2015 Kem
+/**
+ * *****************************************************************************
+ * Copyright (C) 2015 Kem
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
  *
  * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ * ****************************************************************************
  */
 package xyz.monotalk.dropwizard.cli.ls;
 
@@ -22,9 +24,14 @@ import io.dropwizard.Configuration;
 import io.dropwizard.cli.Command;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
+import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 import java.util.List;
 import net.sourceforge.argparse4j.inf.Namespace;
 import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyZeroInteractions;
@@ -50,6 +57,16 @@ public class LsCommandTest {
     private final MyApplication application = new MyApplication();
     private final LsCommand<Configuration> command = new LsCommand<>(application);
 
+    private PrintStream defaultPrintStream;
+    private ByteArrayOutputStream byteArrayOutputStream;
+
+    @Before
+    public void setUp() {
+        defaultPrintStream = System.out;
+        byteArrayOutputStream = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(new BufferedOutputStream(byteArrayOutputStream)));
+    }
+
     @SuppressWarnings("unchecked")
     private final Bootstrap<Configuration> bootstrap = mock(Bootstrap.class);
     private final Namespace namespace = mock(Namespace.class);
@@ -73,5 +90,28 @@ public class LsCommandTest {
         when(bootstrap.getCommands()).thenReturn(ImmutableList.copyOf(commands));
         command.run(bootstrap, namespace, configuration);
         verifyZeroInteractions(configuration);
+    }
+
+    @Test
+    public void testRun() throws Exception {
+        application.run(new String[]{"ls"});
+        System.out.flush();
+        String actual = byteArrayOutputStream.toString();
+        System.setOut(defaultPrintStream);
+        System.out.println(actual);
+    }
+
+    @Test
+    public void testRunDetail() throws Exception {
+        application.run(new String[]{"ls", "-l"});
+        System.out.flush();
+        String actual = byteArrayOutputStream.toString();
+        System.setOut(defaultPrintStream);
+        System.out.println(actual);
+    }
+
+    @After
+    public void tearDown() {
+        System.setOut(defaultPrintStream);
     }
 }

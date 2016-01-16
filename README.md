@@ -5,7 +5,9 @@ dropwizard-ls-command extends dropwizard's default cli and provides output like 
 grab via Maven:  
 ```xml
     <repositories>
-        ....
+        <!-- your dependencies>
+        <!-- ...-->
+        <!-- dropwizard-ls-command's repository-->
         <repository>
             <id>kemsakurai.github.io</id>
             <url>https://kemsakurai.github.io/maven/master/releases</url>
@@ -18,7 +20,8 @@ grab via Maven:
         </repository>
     </repositories>
     <dependencies>
-        ....
+        <!-- your dependencies>
+        <!-- ...-->
         <!-- dropwizard-ls-command -->
         <dependency>
             <groupId>xyz.monotalk.dropwizard</groupId>
@@ -30,16 +33,52 @@ grab via Maven:
 or Gradle:
 
 ```gradle
-    
+
     repositories {
-          ...
           maven { url 'https://kemsakurai.github.io/maven/master/releases' }
     }
-    compile 'dropwizard-ls-command:0.0.2'
 
+    compile 'dropwizard-ls-command:0.0.2'
+    
 ```
 
 # Usage
+####1. Add LsCommand in the initialize stage of your application.
+
+```    
+
+        public void initialize(Bootstrap<Configuration> bootstrap) {
+            bootstrap.addCommand(new LsCommand(this));
+            // And your initialize process..
+        }
+
+```
+
+####2. Compile your source code.
+
+
+####3. Output commad list
+
+* command
+
+```Bash
+java -jar target/xxx.jar ls
+```
+
+* output 
+
+![output](./output.png "output")
+
+####4. Output commad list detail
+
+* command
+
+```Bash
+java -jar target/xxx.jar ls -l
+```
+* output 
+
+![output](./output_detail.png "output_detail")
 
 
 # License
