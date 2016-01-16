@@ -1,18 +1,20 @@
-/*******************************************************************************
+/**
+ * *****************************************************************************
  * Copyright (C) 2015 Kem
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- ******************************************************************************/
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ *****************************************************************************
+ */
 package xyz.monotalk.dropwizard.cli.ls;
 
 import com.google.common.base.Charsets;
@@ -59,7 +61,7 @@ public class LsCommand<T extends Configuration> extends ConfiguredCommand<T> {
 
     private final Set<Class<? extends Command>> defaultCommands = new HashSet<Class<? extends Command>>() {
         private static final long serialVersionUID = -2855157286174568533L;
-        
+
         {
             add(ServerCommand.class);
             add(CheckCommand.class);
@@ -93,7 +95,7 @@ public class LsCommand<T extends Configuration> extends ConfiguredCommand<T> {
                 .action(Arguments.storeTrue())
                 .help("List in long format. If the output is to a terminal, command's helps is output after command description");
     }
-    
+
     @Override
     protected void run(Bootstrap<T> bootstrap, Namespace namespace, T configuration) throws Exception {
         // --------------------------------------------
@@ -105,12 +107,12 @@ public class LsCommand<T extends Configuration> extends ConfiguredCommand<T> {
         if (hasLOptinon == null) {
             hasLOptinon = false;
         }
-        
+
         Set<CommandString> commandStrings = newCommandStrings(bootstrap.getCommands());
-        
+
         stdOut.println();
         stdOut.println("available commands:");
-        
+
         String previousCategory = null;
         for (CommandString elem : commandStrings) {
             if (!elem.getCategory().equals(previousCategory)) {
@@ -120,7 +122,7 @@ public class LsCommand<T extends Configuration> extends ConfiguredCommand<T> {
                 previousCategory = currentCategory;
 
             }
-            
+
             stdOut.println(INDENT_ASTAH + elem.getName() + " : " + ansi().fg(BLUE).a(elem.getDescription()).reset());
 
             if (hasLOptinon) {
